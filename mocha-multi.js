@@ -139,8 +139,14 @@ function resolveStream(destination) {
   }
   debug("Resolved stream '%s' into writeable file stream", destination);
   // Ensure we can write here
-  fs.writeFileSync(destination, '');
-  return fs.createWriteStream(destination);
+  fs.stat(destination, function(err, stat) {
+      if(err == null) {
+          fs.appendFile(destination, ',\r\n');
+      } else {
+          fs.writeFileSync(destination, '[');
+      }
+  });
+  return fs.createWriteStream(destination, { flags: 'a' });
 }
 
 function createRunnerShim(runner, stream) {
